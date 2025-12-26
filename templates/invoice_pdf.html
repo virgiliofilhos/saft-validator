@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+  <meta charset="utf-8">
+  <title>{{ labels.doc_title }} - {{ invoice_view.invoice.invoice_no }}</title>
+  <style>
+    @page { size: A4; margin: 14mm; }
+    body { font-family: Arial, sans-serif; color:#111; font-size: 11.5px; }
+    .top { display:flex; justify-content:space-between; align-items:flex-start; gap:14px; }
+    .h1 { font-size: 18px; font-weight: 800; margin:0; }
+    .muted { color:#555; font-size: 10px; }
+    .box { border:1px solid #ddd; border-radius: 10px; padding: 10px; }
+    .grid2 { display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+    .kv { line-height: 1.35; }
+    .kv b { font-weight: 800; }
+    .mono { font-family: "Courier New", monospace; font-size: 10px; word-break: break-all; }
+    table { width:100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { border-bottom: 1px solid #e5e5e5; padding: 6px; vertical-align: top; }
+    th { text-align:left; background:#f3f3f3; font-size: 10.5px; }
+    .right { text-align:right; }
+    .totals { margin-top: 12px; display:flex; justify-content:flex-end; }
+    .totals .box { width: 280px; }
+    .tot-line { display:flex; justify-content:space-between; padding: 4px 0; }
+    .tot-line strong { font-size: 12.5px; }
+    .foot { margin-top: 10px; }
+    .hr { height:1px; background:#ddd; margin: 10px 0; }
+  </style>
+</head>
+<body>
+
+<div class="top">
+  <div>
+    <p class="h1">{{ labels.doc_title }}</p>
+    <div class="muted">
+      <div><b>{{ labels.invoice_no }}:</b> {{ invoice_view.invoice.invoice_no }} &nbsp; <b>{{ labels.invoice_type }}:</b> {{ invoice_view.invoice.invoice_type }}</div>
+      <div><b>{{ labels.date }}:</b> {{ invoice_view.invoice.invoice_date }} &nbsp; <b>{{ labels.period }}:</b> {{ invoice_view.invoice.period }}</div>
+      <div><b>{{ labels.atcud }}:</b> <span class="mono">{{ invoice_view.invoice.atcud }}</span></div>
+    </div>
+  </div>
+  <div class="box">
+    <div class="kv">
+      <b>{{ labels.currency }}:</b> {{ invoice_view.totals.currency }}<br>
+      <b>{{ labels.hash_control }}:</b> {{ invoice_view.invoice.hash_control }}
+    </div>
+  </div>
+</div>
+
+<div class="grid2">
+  <div class="box">
+    <div class="kv">
+      <b>{{ labels.supplier }}</b><br>
+      <b>{{ invoice_view.supplier.company_name }}</b><br>
+      {{ labels.nif }}: {{ invoice_view.supplier.nif }}<br>
+      {{ invoice_view.supplier.address_detail }}<br>
+      {{ invoice_view.supplier.postal }} {{ invoice_view.supplier.city }} — {{ invoice_view.supplier.country }}<br>
+      {% if invoice_view.supplier.email != "—" %}{{ labels.email }}: {{ invoice_view.supplier.email }}<br>{% endif %}
+      {{ labels.software_cert }}: {{ invoice_view.supplier.software_cert }}<br>
+      {{ labels.product_app }}: {{ invoice_view.supplier.product_id }} ({{ labels.version }} {{ invoice_view.supplier.product_version }})
+    </div>
+  </div>
+
+  <div class="box">
+    <div class="kv">
+      <b>{{ labels.customer }}</b><br>
+      <b>{{ invoice_view.customer.company_name }}</b><br>
+      {{ labels.nif }}: {{ invoice_view.customer.nif }}<br>
+      {{ invoice_view.customer.addr_detail }}<br>
+      {{ invoice_view.customer.postal }} {{ invoice_view.customer.city }} — {{ invoice_view.customer.country }}<br>
+    </div>
+  </div>
+</div>
+
+{% if invoice_view.shipping %}
+<div class="grid2">
+  <div class="box">
+    <div class="kv"><b>{{ labels.ship_from }}</b><br>
+      {{ invoice_view.shipping.from.addr }}<br>
+      {{ invoice_view.shipping.from.postal }} {{ invoice_view.shipping.from.city }} — {{ invoice_view.shipping.from.country }}
+    </div>
+  </div>
+  <div class="box">
+    <div class="kv"><b>{{ labels.ship_to }}</b><br>
+      {{ invoice_view.shipping.to.addr }}<br>
+      {{ invoice_view.shipping.to.postal }} {{ invoice_view.shipping.to.city }} — {{ invoice_view.shipping.to.country }}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>{{ labels.product }}</th>
+      <th>{{ labels.description }}</th>
+      <th class="right">{{ labels.qty }}</th>
+      <th class="right">{{ labels.unit_price }}</th>
+      <th class="right">{{ labels.vat }}</th>
+      <th class="right">{{ labels.line_total }}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for l in invoice_view.lines %}
+    <tr>
+      <td>{{ l.line_number }}</td>
+      <td>
+        <b>{{ l.product_code }}</b><br>
+        <span class="muted">{{ l.product_desc }}</span>
+      </td>
+      <td>
+        {{ l.description }}
+        {% if l.exemption_code != "—" or l.exemption_reason != "—" %}
+        <div class="muted" style="margin-top:4px;">
+          <b>{{ labels.exemption }}:</b> {{ l.exemption_code }} — {{ l.exemption_reason }}
+        </div>
+        {% endif %}
+      </td>
+      <td class="right">{{ l.qty }} {{ l.uom }}</td>
+      <td class="right">{{ l.unit_price }}</td>
+      <td class="right">{{ l.tax_pct }}% ({{ l.tax_code }})</td>
+      <td class="right">{% if l.credit_amount != "—" %}{{ l.credit_amount }}{% else %}{{ l.debit_amount }}{% endif %}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="totals">
+  <div class="box">
+    <div class="kv"><b>{{ labels.totals }}</b></div>
+    <div class="tot-line"><span>{{ labels.net }}</span><span>{{ invoice_view.totals.net }} {{ invoice_view.totals.currency }}</span></div>
+    <div class="tot-line"><span>{{ labels.tax }}</span><span>{{ invoice_view.totals.tax }} {{ invoice_view.totals.currency }}</span></div>
+    <div class="tot-line"><strong>{{ labels.gross }}</strong><strong>{{ invoice_view.totals.gross }} {{ invoice_view.totals.currency }}</strong></div>
+  </div>
+</div>
+
+<div class="foot">
+  <div class="hr"></div>
+  <div class="kv">
+    <b>{{ labels.hash }}:</b> <span class="mono">{{ invoice_view.invoice.hash }}</span>
+  </div>
+  <p class="muted" style="margin-top:6px;">{{ labels.generated_from_saft }}</p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title>Validador de Compras (PDF)</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; background: #f7f9fb; }
+    .container { max-width: 1100px; margin: auto; }
+    .card { background: #fff; border-radius: 14px; padding: 18px; margin-bottom: 18px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+    .nav a { margin-right: 14px; text-decoration: none; font-weight: bold; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field { padding: 10px 12px; border-radius: 12px; background: #f3f6fa; border: 1px solid #e5edf7; }
+    .label { font-size: 12px; color: #666; }
+    .value { font-size: 15px; font-weight: bold; margin-top: 4px; line-height: 1.25; }
+    .badge { display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: 11px; margin-left: 8px; border: 1px solid transparent; }
+    .badge.ok { background: #e7f6ea; color: #1b5e20; border-color: #cdeed3; }
+    .badge.warn { background: #fff4e5; color: #7a4b00; border-color: #ffe1b8; }
+    .badge.bad { background: #fde7e7; color: #7f1d1d; border-color: #f7c6c6; }
+    .badge.inferido { background: #eef2ff; color: #1e40af; border-color: #c7d2fe; }
+    .note { margin-top: 6px; font-size: 12px; color: #4b5563; }
+    img.preview { max-width: 100%; border: 1px solid #ddd; border-radius: 12px; }
+    pre { background: #0b1020; color: #d7e3ff; padding: 14px; border-radius: 12px; max-height: 340px; overflow: auto; font-size: 12px; white-space: pre-wrap; }
+    details summary { cursor: pointer; font-weight: bold; }
+    button { padding: 10px 16px; border-radius: 12px; border: none; cursor: pointer; background: #1976d2; color: white; font-weight: bold; }
+    button:hover { background: #125ea6; }
+    .error { color: #7f1d1d; }
+    .muted { color: #6b7280; font-size: 12px; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <!-- LINKS FIXOS (NUNCA REMOVER) -->
+  <div class="nav">
+    <a href="/">✅ Validar SAF-T XML</a>
+    <a href="/purchase-pdf">📄 Analisar Fatura PDF (OCR)</a>
+  </div>
+
+  <h1>Validador de Compras (PDF)</h1>
+
+  <p class="muted">
+    Análise documental assistida por OCR. Não guarda ficheiros. Campos podem ficar inconclusivos dependendo do layout/qualidade do scan.
+  </p>
+
+  <div class="card">
+    <form method="post" enctype="multipart/form-data">
+      <input type="file" name="file" accept=".pdf" required>
+      <button type="submit">Analisar documento</button>
+    </form>
+  </div>
+
+  <!-- 1) Dados primeiro -->
+  {% if invoice %}
+  <div class="card">
+    <h2>🧾 Dados extraídos</h2>
+    <div class="grid">
+      {% for k, v in invoice.items() %}
+      <div class="field">
+        <div class="label">{{ v.label }}</div>
+        <div class="value">
+          {{ v.value }}
+          <span class="badge {{ v.status }}">{{ v.status|upper }}</span>
+        </div>
+        {% if v.note %}
+          <div class="note">ℹ {{ v.note }}</div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if errors and errors|length > 0 %}
+  <div class="card">
+    <h2 class="error">❌ Observações</h2>
+    <ul>
+      {% for e in errors %}
+      <li class="error">{{ e }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <!-- 2) Preview do PDF -->
+  {% if pdf_preview %}
+  <div class="card">
+    <h2>📄 Documento (pré-visualização)</h2>
+    <img class="preview" src="data:image/png;base64,{{ pdf_preview }}">
+  </div>
+  {% endif %}
+
+  <!-- 3) OCR por fim -->
+  {% if ocr_text %}
+  <div class="card">
+    <details>
+      <summary>🧠 Texto OCR completo</summary>
+      <pre>{{ ocr_text }}</pre>
+    </details>
+  </div>
+  {% endif %}
+</div>
+</body>
+</html>

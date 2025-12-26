@@ -1,0 +1,136 @@
+<div class="card invoice-wrap">
+
+  <!-- Cabeçalho -->
+  <div class="inv-head">
+    <div class="inv-head-top">
+      <div style="display:flex; gap:16px; align-items:flex-start;">
+        <img src="/static/logo.png"
+             alt="Logo"
+             style="height:52px; max-width:180px; object-fit:contain;"
+             onerror="this.style.display='none'">
+        <div>
+          <h2 class="inv-title">FATURA</h2>
+          <div class="inv-sub">
+            <b>N.º:</b> {{ iv.invoice.invoice_no }}<br>
+            <b>Data:</b> {{ iv.invoice.invoice_date }}<br>
+            <b>Tipo:</b> {{ iv.invoice.invoice_type }} |
+            <b>Período:</b> {{ iv.invoice.period }}
+          </div>
+        </div>
+      </div>
+      <div class="inv-badges">
+        <span class="badge">ATCUD: {{ iv.invoice.atcud }}</span>
+        <span class="badge">{{ iv.totals.currency }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="inv-body">
+
+    <!-- Emitente / Cliente -->
+    <div class="grid2">
+      <div class="box">
+        <h3>Emitente</h3>
+        <div class="kv">
+          <b>{{ iv.supplier.company_name }}</b><br>
+          NIF: {{ iv.supplier.nif }}<br>
+          {{ iv.supplier.address_detail }}<br>
+          {{ iv.supplier.postal }} {{ iv.supplier.city }} – {{ iv.supplier.country }}<br>
+          Email: {{ iv.supplier.email }}<br>
+          Programa certificado AT: {{ iv.supplier.software_cert }}<br>
+          Produto: {{ iv.supplier.product_id }} ({{ iv.supplier.product_version }})
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Cliente</h3>
+        <div class="kv">
+          <b>{{ iv.customer.company_name }}</b><br>
+          NIF: {{ iv.customer.nif }}<br>
+          {{ iv.customer.addr_detail }}<br>
+          {{ iv.customer.postal }} {{ iv.customer.city }} – {{ iv.customer.country }}<br>
+          Contacto: {{ iv.customer.contact }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Ship From / To -->
+    <div class="grid2" style="margin-top:14px;">
+      <div class="box">
+        <h3>Local de Expedição (Ship From)</h3>
+        <div class="kv">
+          {{ iv.shipping.from.addr }}<br>
+          {{ iv.shipping.from.postal }} {{ iv.shipping.from.city }} – {{ iv.shipping.from.country }}
+        </div>
+      </div>
+      <div class="box">
+        <h3>Local de Destino (Ship To)</h3>
+        <div class="kv">
+          {{ iv.shipping.to.addr }}<br>
+          {{ iv.shipping.to.postal }} {{ iv.shipping.to.city }} – {{ iv.shipping.to.country }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Linhas -->
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Produto</th>
+          <th>Descrição</th>
+          <th class="right">Qtd</th>
+          <th class="right">Preço Unit.</th>
+          <th class="right">IVA</th>
+          <th class="right">Total Linha</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for l in iv.lines %}
+        <tr>
+          <td>{{ l.line_number }}</td>
+          <td>{{ l.product_code }}</td>
+          <td>
+            {{ l.description }}
+            {% if l.exemption_reason %}
+              <div class="muted">Isenção: {{ l.exemption_reason }} ({{ l.exemption_code }})</div>
+            {% endif %}
+          </td>
+          <td class="right">{{ l.qty }}</td>
+          <td class="right">{{ l.unit_price }}</td>
+          <td class="right">{{ l.tax_pct }}%</td>
+          <td class="right">{{ l.credit_amount }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Totais -->
+    <div class="totals">
+      <div class="box">
+        <div class="tot-line">
+          <span>Total líquido</span>
+          <span>{{ iv.totals.net }} {{ iv.totals.currency }}</span>
+        </div>
+        <div class="tot-line">
+          <span>IVA</span>
+          <span>{{ iv.totals.tax }} {{ iv.totals.currency }}</span>
+        </div>
+        <div class="tot-line">
+          <strong>Total a pagar</strong>
+          <strong>{{ iv.totals.gross }} {{ iv.totals.currency }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rodapé técnico -->
+    <div class="footnote">
+      <b>Hash:</b>
+      <span class="mono">{{ iv.invoice.hash }}</span><br>
+      <b>HashControl:</b> {{ iv.invoice.hash_control }} |
+      <b>SourceID:</b> {{ iv.invoice.source_id }} |
+      <b>Data de registo:</b> {{ iv.invoice.system_entry_date }}
+    </div>
+
+  </div>
+</div>
