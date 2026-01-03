@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: saft-validator
+  namespace: saft
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production-cialinux
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - saft-validator.dev.cialinux.com
+      secretName: saft-validator-dev-tls
+  rules:
+    - host: saft-validator.dev.cialinux.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: saft-validator
+                port:
+                  number: 80
