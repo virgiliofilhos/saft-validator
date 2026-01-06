@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: saft-validator
-        image: virgiliofilhos/saft-validator:1.0.10
+        image: virgiliofilhos/saft-validator:1.0.11
         imagePullPolicy: Always
         ports:
         - containerPort: 5000
