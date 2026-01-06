@@ -4,7 +4,7 @@ metadata:
   name: saft-validator
   namespace: saft
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-production-cialinux
+    cert-manager.io/cluster-issuer: letsencrypt-staging-cialinux
 spec:
   ingressClassName: nginx
   tls:
