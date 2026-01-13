@@ -15,7 +15,17 @@ spec:
     - host: saft-validator.cialinux.com
       http:
         paths:
+          # UI + site
           - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: saft-validator
+                port:
+                  number: 80
+
+          # API pública (EXPLÍCITO)
+          - path: /api
             pathType: Prefix
             backend:
               service:
