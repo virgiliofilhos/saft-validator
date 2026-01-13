@@ -4,7 +4,7 @@ metadata:
   name: saft-validator
   namespace: saft
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-production-cialinux
+    cert-manager.io/cluster-issuer: letsencrypt-staging-cialinux
 spec:
   ingressClassName: nginx
   tls:
@@ -15,7 +15,17 @@ spec:
     - host: saft-validator.dev.cialinux.com
       http:
         paths:
+          # UI + site
           - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: saft-validator
+                port:
+                  number: 80
+
+          # API pública (EXPLÍCITO)
+          - path: /api
             pathType: Prefix
             backend:
               service:

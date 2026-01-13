@@ -13,6 +13,8 @@ spec:
       labels:
         app: saft-validator
     spec:
+      imagePullSecrets:
+        - name: cred-dockerhub
       containers:
       - name: saft-validator
         image: virgiliofilhos/saft-validator:1.0.30
