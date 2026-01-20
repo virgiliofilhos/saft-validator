@@ -9,6 +9,6 @@ kubectl apply -k overlays/prod
 ```
 
 ---
-dev -> https://saft-validator.dev.cialinux.com:2000
+dev -> https://saft-validator.dev.cialinux.com
 
-pro -> https://saft-validator.cialinux.com:4000
+pro -> https://saft-validator.cialinux.com
