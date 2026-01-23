@@ -17,7 +17,7 @@ spec:
         - name: cred-dockerhub
       containers:
       - name: saft-validator
-        image: virgiliofilhos/saft-validator:1.0.31
+        image: virgiliofilhos/saft-validator:1.0.32
         imagePullPolicy: Always
         ports:
         - containerPort: 5000
